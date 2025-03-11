@@ -1,0 +1,34 @@
+services:
+  docker-ckpool:
+    image: docker-ckpool
+    ports:
+      - 3333:3333
+    extra_hosts:
+      - ckpool.local:host-gateway
+    volumes:
+      - ${PWD}/conf:/srv/ckpool/conf
+      - ${PWD}/logs:/srv/ckpool/logs
+    restart: unless-stopped
+
+  pool-logs:
+    image: alpine
+    volumes:
+      - ${PWD}/logs:/srv/ckpool/logs
+    command: sh -c "tail -f /srv/ckpool/logs/ckpool.log"
+    restart: unless-stopped
+
+  pool-status:
+    image: alpine
+    volumes:
+      - ${PWD}/logs:/srv/ckpool/logs
+      - ./pool_status.sh:/pool_status.sh
+    command: sh -c "sh /pool_status.sh"
+    restart: unless-stopped
+
+  pool-users:
+    image: alpine
+    volumes:
+      - ${PWD}/logs:/srv/ckpool/logs
+      - ./print_users.sh:/print_users.sh
+    command: sh -c "sh /print_users.sh"
+    restart: unless-stopped
